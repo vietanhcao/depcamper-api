@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const slugify = require("slugify");
 
 const BootcampSchema = new mongoose.Schema({
 	name: {
@@ -33,29 +34,33 @@ const BootcampSchema = new mongoose.Schema({
 		type: String,
 		required: [true, "Please add a address"],
 	},
-	// location: {
-	// 	//GeoJSON Point
-	// 	type: {
-	// 		type: String, // Don't do `{ location: { type: String } }`
-	// 		enum: ["Point"], // 'location.type' must be 'Point'
-	// 		required: true,
-	// 	},
-	// 	coordinates: {
-	// 		type: [Number],
-	// 		required: true,
-	// 		index: "2dsphere",
-	// 	},
-	// 	formattedAdress: String,
-	// 	street: String,
-	// 	city: String,
-	// 	state: String,
-	// 	zipCode: String,
-	// 	country: String,
-	// },
+	location: {
+		//GeoJSON Point
+		type: {
+			type: String, // Don't do `{ location: { type: String } }`
+			enum: ["Point"], // 'location.type' must be 'Point'
+		},
+		coordinates: {
+			type: [Number],
+			index: "2dsphere",
+		},
+		formattedAdress: String,
+		street: String,
+		city: String,
+		state: String,
+		zipCode: String,
+		country: String,
+	},
 	careers: {
 		type: [String],
 		required: true,
-		enum: ["Web Development", "Mobile Development", "UI/UX", "Data Science", "Business"],
+		enum: [
+			"Web Development",
+			"Mobile Development",
+			"UI/UX",
+			"Data Science",
+			"Business",
+		],
 	},
 	averageRating: {
 		type: Number,
@@ -87,6 +92,12 @@ const BootcampSchema = new mongoose.Schema({
 		type: Date,
 		default: Date.now(),
 	},
+});
+
+//Create bootCamp slug from the name
+BootcampSchema.pre("save", function (next) {
+	this.slug = slugify(this.name, { lower: true });
+	next();
 });
 
 module.exports = mongoose.model("Bootcamp", BootcampSchema);
