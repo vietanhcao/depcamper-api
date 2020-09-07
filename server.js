@@ -15,12 +15,12 @@ connectDB()
 // Route files
 
 const bootcamps = require('./router/bootcamp.js');
+const courses = require('./router/courses.js');
 
 const app = express();
 
 //Body parser
 app.use(express.json())
-
 
 //Dev logging middleware
 if(process.env.NODE_ENV === 'development'){
@@ -30,6 +30,7 @@ if(process.env.NODE_ENV === 'development'){
 
 //Mount routers
 app.use('/api/v1/bootcamps', bootcamps);
+app.use('/api/v1/courses', courses);
 
 
 
