@@ -55,7 +55,7 @@ exports.getCourse = asyncHandler(async (req, res, next) => {
  * @access Private
  */
 exports.addCourse = asyncHandler(async (req, res, next) => {
-  req.body.bootcamp = req.params.bootcampId;
+  req.body.bootcamp = req.params.bootcampId;  //add bootcamp before create
 
   const bootcamp = await Bootcamp.findById(req.params.bootcampId);
 
