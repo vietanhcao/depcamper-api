@@ -51,6 +51,39 @@ exports.login = asyncHandler(async (req, res, next) => {
   sendTokenResponse(user, 200, res);
 });
 
+/**
+ * @desc Get current logger in user
+ * @route Post /api/v1/auth/me
+ * @access Private
+ */
+exports.getMe = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+
+  res.status(200).json({ success: true, data: user });
+});
+
+/**
+ * @desc Forgot password
+ * @route Post /api/v1/auth/forgotpassword
+ * @access Public
+ */
+exports.forgotPassword = asyncHandler(async (req, res, next) => {
+  const user = await User.findOne({ email: req.body.email });
+
+  if (!user) {
+    return next(new ErrorResponse(`There is no user with that email`, 404));
+  }
+
+  // Get reset token
+  const resetToken = await user.getResetPasswordToken();
+
+  await user.save({ validateBeforeSave: false });
+  
+
+
+  res.status(200).json({ success: true, data: user });
+});
+
 // Get token from model, create cookie and send response
 const sendTokenResponse = async (user, statusCode, res) => {
   //Create token
@@ -63,7 +96,7 @@ const sendTokenResponse = async (user, statusCode, res) => {
     httpOnly: true,
   };
 
-  if(process.env.NODE_ENV === 'production'){
+  if (process.env.NODE_ENV === "production") {
     options.secure = true;
   }
 
@@ -72,14 +105,3 @@ const sendTokenResponse = async (user, statusCode, res) => {
     .cookie("token", token, options)
     .json({ success: true, token });
 };
-
-/**
- * @desc Get current logger in user
- * @route Post /api/v1/auth/me
- * @access Private
- */
-exports.getMe = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
-
-  res.status(200).json({ success: true, data: user})
-})
