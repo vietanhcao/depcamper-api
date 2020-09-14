@@ -2,6 +2,8 @@ const User = require("../models/User");
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middleware/async");
 const path = require("path");
+const sendEmail = require("../utils/sendMail");
+const crypto = require("crypto");
 
 /**
  * @desc Register user
@@ -78,10 +80,59 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
   const resetToken = await user.getResetPasswordToken();
 
   await user.save({ validateBeforeSave: false });
+
+  // Create reset URL
+  const resetUrl = `${req.protocol}://${req.get(
+    "host",
+  )}/api/v1/auth/resetpassword/${resetToken}`;
+
+  const message = `You are receiving thi email because you (or someone else) has requested the reset of  a password. Please make sure a PUT to \n\n ${resetUrl}`;
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: "Password Reset Token",
+      message,
+    });
+    res.status(200).json({ success: true, data: "Email sent" });
+  } catch (err) {
+    console.log(err);
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save({ validateBeforeSave: false });
+
+    return next(new ErrorResponse("Email could be sent successfully", 500));
+  }
+});
+
+/**
+ * @desc Reset password
+ * @route Put /api/v1/auth/resetpassword/:resettoken
+ * @access Public
+ */
+exports.resetpassword = asyncHandler(async (req, res, next) => {
+  // Get hashed token
+  const resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(req.params.resettoken)
+    .digest("hex");
   
+  const user = await User.findOne({
+    resetPasswordToken,
+    resetPasswordExpire: { $gt: Date.now() }
+  });
 
+  if(!user){
+    return next(new ErrorResponse("invalid Token", 400)); 
+  }
 
-  res.status(200).json({ success: true, data: user });
+  //Set new Password
+  user.password = req.body.password;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+  await user.save();
+
+  sendTokenResponse(user, 200, res);
 });
 
 // Get token from model, create cookie and send response
