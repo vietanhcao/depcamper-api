@@ -1,3 +1,8 @@
+/**
+ * @desc include pagination, filter, select etc...
+ * @params model required
+ * 
+ */
 const advancedResult = (model, populate) => async (req, res, next) => {
   let query;
 

@@ -21,6 +21,7 @@ connectDB()
 const bootcamps = require('./router/bootcamp.js');
 const courses = require('./router/courses.js');
 const auth = require('./router/auth.js');
+const users = require('./router/users.js');
 
 const app = express();
 
@@ -47,6 +48,7 @@ app.use(express.static(path.join(__dirname, 'public'))); //  localhost uploads/.
 app.use('/api/v1/bootcamps', bootcamps);
 app.use('/api/v1/courses', courses);
 app.use('/api/v1/auth', auth);
+app.use('/api/v1/users', users);
 
 
 

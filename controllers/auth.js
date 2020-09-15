@@ -111,25 +111,62 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
  * @access Public
  */
 exports.resetpassword = asyncHandler(async (req, res, next) => {
-  // Get hashed token
+  // Get hashed token and generate again resetPasswordToken
   const resetPasswordToken = crypto
     .createHash("sha256")
     .update(req.params.resettoken)
     .digest("hex");
-  
   const user = await User.findOne({
     resetPasswordToken,
-    resetPasswordExpire: { $gt: Date.now() }
+    resetPasswordExpire: { $gt: Date.now() },
   });
 
-  if(!user){
-    return next(new ErrorResponse("invalid Token", 400)); 
+  if (!user) {
+    return next(new ErrorResponse("invalid Token", 400));
   }
 
   //Set new Password
   user.password = req.body.password;
   user.resetPasswordToken = undefined;
   user.resetPasswordExpire = undefined;
+  await user.save();
+
+  sendTokenResponse(user, 200, res);
+});
+
+/**
+ * @desc Update user details
+ * @route Put /api/v1/auth/updatedetail
+ * @access Private
+ */
+exports.updateDetails = asyncHandler(async (req, res, next) => {
+  const fieldsToUpdate = {
+    name: req.body.name,
+    email: req.body.email,
+  };
+  const user = await User.findByIdAndUpdate(req.user.id, fieldsToUpdate, {
+    new: true,
+    runValidators: true,
+  });
+
+  res.status(200).json({ success: true, data: user });
+});
+
+/**
+ * @desc Update password
+ * @route Put /api/v1/auth/updatepassword
+ * @access Private
+ */
+exports.updatePassword = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id).select("password");
+
+  // Check current password
+  if (!(await user.matchPassword(req.body.currentPassword))) {
+    return next(new ErrorResponse(`Password is incorrect`, 400));
+  }
+
+  user.password = req.body.newPassword;
+
   await user.save();
 
   sendTokenResponse(user, 200, res);

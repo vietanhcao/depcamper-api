@@ -10,7 +10,7 @@ const path = require('path');
  * @access public
  */
 exports.getBootcamps = asyncHandler(async (req, res, next) => {
-  res.status(200).json(res.advancedResult);
+  res.status(200).json(res.advancedResult); // advancedResult  
 });
 
 /**

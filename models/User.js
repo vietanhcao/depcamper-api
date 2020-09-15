@@ -61,14 +61,13 @@ UserSchema.methods.matchPassword = async function (enteredPassword) {
 // Generate and hash password token
 UserSchema.methods.getResetPasswordToken = async function () {
   // Generate token
-  const resetToken = crypto.randomBytes(20).toString("hex");
+  const resetToken = crypto.randomBytes(20).toString("hex"); // use with url token like public key
 
   // Hash token and set to resetPasswordToken field
-  this.resetPasswordToken = crypto
+  this.resetPasswordToken = crypto // like private key
     .createHash("sha256")
     .update(resetToken)
     .digest("hex");
-
   // Set expire
   this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
 
