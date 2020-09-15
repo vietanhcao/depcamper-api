@@ -22,6 +22,7 @@ const bootcamps = require('./router/bootcamp.js');
 const courses = require('./router/courses.js');
 const auth = require('./router/auth.js');
 const users = require('./router/users.js');
+const reviews = require('./router/reviews.js');
 
 const app = express();
 
@@ -49,6 +50,7 @@ app.use('/api/v1/bootcamps', bootcamps);
 app.use('/api/v1/courses', courses);
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/users', users);
+app.use('/api/v1/reviews', reviews);
 
 
 

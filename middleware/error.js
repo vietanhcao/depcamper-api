@@ -8,7 +8,7 @@ const errorHandler = (err, req, res, next) => {
   console.log(err)
   
   //Mongoose bad ObjectId
-  if(err.name === 'CastError'){
+  if(err.name === 'CastError'){ // not format with objectID
     error = new ErrorResponse(`Resource not found with id of ${err.value}`, 404) 
   }
 
