@@ -1,5 +1,5 @@
 const Bootcamp = require('../models/Bootcamp');
-const ErrorResponse = require('../utils/errorResponse');
+const ErrorResponse = require('../utils/ErrorResponse');
 const asyncHandler = require('../middleware/async');
 const geocoder = require('../utils/geocoder');
 const path = require('path');
