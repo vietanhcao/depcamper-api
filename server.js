@@ -30,7 +30,7 @@ const reviews = require("./router/reviews.js");
 
 const app = express();
 
-//Body parser
+// Body parser
 app.use(express.json());
 
 // Cookie parser
