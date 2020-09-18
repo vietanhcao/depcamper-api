@@ -50,7 +50,7 @@ app.use(mongoSanitize());
 // Set security headers
 app.use(helmet());
 
-// Preven XXS attacks
+// Prevent XXS attacks
 app.use(xss());
 
 // Rate limiting
@@ -91,3 +91,4 @@ process.on("unhandledRejection", (error, promise) => {
   // Close server & exit process
   server.close(() => process.exit(1));
 });
+
