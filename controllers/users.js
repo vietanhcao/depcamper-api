@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const asyncHandler = require("../middleware/async");
+const ErrorResponse = require("../utils/ErrorResponse");
 
 /**
  * @desc Get all users
@@ -34,10 +35,20 @@ exports.createUser = asyncHandler(async (req, res, next) => {
 
 /**
  * @desc Update user
- * @route Put /api/v1/users/id
+ * @route Put /api/v1/users/:id
  * @access Private/Admin
  */
 exports.updateUser = asyncHandler(async (req, res, next) => {
+  // const updates = Object.keys(req.body);
+  // const allowedUpdates = ['name', 'role'];
+  // const isValidOperator = updates.every( update => allowedUpdates.includes(update));
+
+  // if(!isValidOperator){
+  //   return next(new ErrorResponse(`Invalid updates`, 400)); 
+  // }
+
+
+
   const user = await User.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
@@ -48,7 +59,7 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
 
 /**
  * @desc Delete user
- * @route Delete /api/v1/users/id
+ * @route Delete /api/v1/users/:id
  * @access Private/Admin
  */
 exports.deleteUser = asyncHandler(async (req, res, next) => {

@@ -3,6 +3,7 @@ const slugify = require("slugify");
 const geocoder = require("../utils/geocoder");
 const path = require("path");
 const fs = require("fs");
+const validator = require("validator");
 
 const BootcampSchema = new mongoose.Schema(
   {
@@ -36,10 +37,15 @@ const BootcampSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      match: [
-        /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i,
-        "Please use a valid email",
-      ],
+      // match: [
+      //   /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i,
+      //   "Please use a valid email",
+      // ],
+      validate: (value) => {
+        if(!validator.isEmail(value)){
+          throw new Error(`Please use a valid email`)
+        }
+      },
       required: [true, "Please add a email"],
     },
     address: {
@@ -113,6 +119,7 @@ const BootcampSchema = new mongoose.Schema(
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
+    timestamps: true
   },
 );
 

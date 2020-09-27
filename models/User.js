@@ -36,12 +36,21 @@ const UserSchema = new mongoose.Schema({
   },
 });
 
+
+// UserSchema.methods.toJSON = function () { // running before send to clinet in User trigle when JSON.stringify
+//   const user = this;
+//   const userObject = user.toObject();
+
+//   delete userObject.password;
+
+//   return userObject
+// }
+
 // Encrypt password using bcryptjs
-UserSchema.pre("save", async function (next) {
+UserSchema.pre("save", async function (next) { 
   if(!this.isModified('password')){// check only craete and update password
     next();
   }
-
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
@@ -64,7 +73,7 @@ UserSchema.methods.getResetPasswordToken = async function () {
   const resetToken = crypto.randomBytes(20).toString("hex"); // use with url token like public key
 
   // Hash token and set to resetPasswordToken field
-  this.resetPasswordToken = crypto // like private key
+  this.resetPasswordToken = crypto // like private key ssh
     .createHash("sha256")
     .update(resetToken)
     .digest("hex");

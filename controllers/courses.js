@@ -7,7 +7,7 @@ const Bootcamp = require("../models/Bootcamp");
  * @desc Get course
  * @route Get /api/v1/courses
  * @route Get /api/v1/bootcapms/:bootcampId/courses       // use mergeParams
- * @access Private
+ * @access Public
  */
 exports.getCourses = asyncHandler(async (req, res, next) => {
 
@@ -33,6 +33,12 @@ exports.getCourse = asyncHandler(async (req, res, next) => {
   const course = await Course.findById(req.params.id).populate({
     path: "bootcamp",
     select: "name description",
+    // match:{weeks: '6'},
+    //   options: {
+    //     limit: parseInt(req.query.limit),
+    //     skip: parseInt(req.query.skip),
+    //     sort // sort[parts[0]] = parts[1] === 'desc' ? -1 : 1 // GET /tasks?sortBy=createdAt:desc
+    // }
   });
 
   if (!course)

@@ -13,6 +13,8 @@ const rateLimit = require("express-rate-limit");
 const hpp = require("hpp");
 const cors = require("cors");
 const xss = require("xss-clean");
+const rfs = require("rotating-file-stream");
+const fs = require("fs");
 
 //load env file
 dotenv.config({ path: "./config/config.env" });
@@ -39,13 +41,32 @@ app.use(cookieParser());
 //Dev logging middleware
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
+} else {
+  const logDirectory = path.join(__dirname, "log");
+  // ensure log directory exists
+  fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory);
+  // create a rotating write stream
+  const accessLogStream = rfs.createStream("access.log", {
+    interval: "1d", // rotate daily
+    path: logDirectory,
+  });
+
+  // setup the logger and log only 4xx and 5xx errors
+  app.use(
+    morgan("combined", {
+      stream: accessLogStream,
+      skip: function (req, res) {
+        return res.statusCode < 400;
+      },
+    }),
+  );
 }
 
 //File uploading
 app.use(findUpload());
 
-// Sanitize data
-app.use(mongoSanitize());
+// Sanitize data  remove $ and .
+app.use(mongoSanitize({ replaceWith: '_' }));
 
 // Set security headers
 app.use(helmet());
@@ -91,4 +112,3 @@ process.on("unhandledRejection", (error, promise) => {
   // Close server & exit process
   server.close(() => process.exit(1));
 });
-
